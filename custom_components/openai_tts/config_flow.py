@@ -89,7 +89,15 @@ class OpenAITTSOptionsFlowHandler(config_entries.OptionsFlow):
     async def async_step_init(self, user_input=None):
         """Manage the TTS options."""
         if user_input is not None:
+            # Ensure we store empty strings as empty strings, not as None
+            if CONF_INSTRUCTIONS in user_input and user_input[CONF_INSTRUCTIONS] == "":
+                user_input[CONF_INSTRUCTIONS] = ""
             return self.async_create_entry(title="", data=user_input)
+
+        # Get current instructions or empty string (not None)
+        current_instructions = self.config_entry.options.get(CONF_INSTRUCTIONS, "")
+        if current_instructions is None:
+            current_instructions = ""
 
         return self.async_show_form(
             step_id="init",
@@ -113,9 +121,7 @@ class OpenAITTSOptionsFlowHandler(config_entries.OptionsFlow):
                     ): vol.In(OPENAI_MODELS),
                     vol.Optional(
                         CONF_INSTRUCTIONS,
-                        default=self.config_entry.options.get(
-                            CONF_INSTRUCTIONS, DEFAULT_INSTRUCTIONS
-                        ),
+                        default=current_instructions,
                     ): str,
                     vol.Optional(
                         CONF_RESPONSE_FORMAT,

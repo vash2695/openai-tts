@@ -1,4 +1,6 @@
 import logging
+import hashlib
+import json
 
 from homeassistant.components.tts import (
     ATTR_AUDIO_OUTPUT,
@@ -114,6 +116,15 @@ class OpenAITTSProvider(TextToSpeechEntity):
     ) -> TtsAudioType:
         """Load TTS from the OpenAI API."""
         return await self._client.get_tts_audio(message, options)
+
+    def get_cache_key_base(self, message: str, language: str, options: dict) -> str:
+        """Get base for generating cache key."""
+        options_json = json.dumps(
+            options, sort_keys=True, ensure_ascii=False, separators=(",", ":")
+        ) if options else "{}"
+        
+        key_base = f"{message}_{language}_{options_json}"
+        return hashlib.sha1(key_base.encode("utf-8")).hexdigest()
 
     def async_get_supported_voices(self, language: str) -> list[Voice] | None:
         """Return a list of supported voices for a language."""

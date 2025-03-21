@@ -100,11 +100,13 @@ class OpenAIClient:
             or DEFAULT_MODEL
         )
         
-        instructions = (
-            options.get(CONF_INSTRUCTIONS)
-            or self.config_entry.options.get(CONF_INSTRUCTIONS)
-            or DEFAULT_INSTRUCTIONS
-        )
+        # Explicitly handle empty string for instructions
+        if CONF_INSTRUCTIONS in options:
+            instructions = options.get(CONF_INSTRUCTIONS)
+        elif CONF_INSTRUCTIONS in self.config_entry.options:
+            instructions = self.config_entry.options.get(CONF_INSTRUCTIONS)
+        else:
+            instructions = DEFAULT_INSTRUCTIONS
         
         response_format = (
             options.get(CONF_RESPONSE_FORMAT)
@@ -131,6 +133,7 @@ class OpenAIClient:
                 "response_format": response_format,
             }
             
+            # Only add instructions if not empty
             if instructions:
                 kwargs["instructions"] = instructions
                 
