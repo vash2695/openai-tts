@@ -1,8 +1,8 @@
 {
-  "name": "ElevenLabs TTS",
-  "filename": "elevenlabs_tts.zip",
-  "hide_default_branch": true,
-  "homeassistant": "2023.8.1",
+  "name": "OpenAI TTS",
   "render_readme": true,
-  "zip_release": true
+  "content_in_root": false,
+  "homeassistant": "2023.8.1",
+  "domains": ["tts"],
+  "iot_class": "cloud_polling"
 }

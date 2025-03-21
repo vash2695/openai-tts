@@ -1,44 +1,43 @@
-# ElevenLabs TTS for Home Assistant
+# OpenAI TTS for Home Assistant
 
-This integration allows you to use ElevenLabs API as a text-to-speech provider for Home Assistant.
+This integration allows you to use OpenAI's Text-to-Speech API as a text-to-speech provider for Home Assistant.
 
-Disclaimer: This repo, the code within, and the maintainer/owner of this repo are in no way affiliated with ElevenLabs.
+Disclaimer: This repo, the code within, and the maintainer/owner of this repo are in no way affiliated with OpenAI.
 
-Privacy disclaimer: Data is transmitted to elevenlabs.io when using this TTS service, do not use it for text containing sensitive information.
+Privacy disclaimer: Data is transmitted to OpenAI when using this TTS service, do not use it for text containing sensitive information.
 
-You can find ElevenLab's privacy policy [here](https://beta.elevenlabs.io/privacy)
+You can find OpenAI's privacy policy [here](https://openai.com/policies/privacy-policy)
 
 ## Installation
 
 This component is available via HACS as a [custom repository](https://hacs.xyz/docs/faq/custom_repositories) which is the recommended method of installation.
 
-You can also copy `custom_components/elevenlabs_tts` to your `custom_components` folder in HomeAssistant if you prefer to install manually.
+You can also copy `custom_components/openai_tts` to your `custom_components` folder in HomeAssistant if you prefer to install manually.
 
 ## Setup
 
-Go to Settings -> Devices & Services -> ADD INTEGRATION, and select ElevenLabs TTS
+Go to Settings -> Devices & Services -> ADD INTEGRATION, and select OpenAI TTS
 
-Enter your api key from your ElevenLabs account and click Submit.
+Enter your API key from your OpenAI account and click Submit.
 
 ### Options:
 
-To customize the default options, in Devices & Services, click CONFIGURE on the ElevenLabs TTS card.
+To customize the default options, in Devices & Services, click CONFIGURE on the OpenAI TTS card.
 
-- `Voice` - Enter the name of one of the voices available in your account
-- `Stability` - Sets the stability of the speech synthesis
-- `Similarity` - Sets the clarity/similarity boost of the speech synthesis
-- `Model` - Determines which model is used to generate speech
-- `Optimize Streaming Latency` - Reduce latency at the cost of quality
+- `Voice` - Choose one of the available voices (echo, alloy, onyx, nova, shimmer, etc.)
+- `Model` - Select which model to use (default is gpt-4o-mini-tts)
+- `Instructions` - Optional instructions to control aspects of speech like accent, emotional range, intonation, etc.
+- `Response Format` - Audio format for the response (mp3, opus, aac, flac, wav, pcm)
 
 ## API key
 
-To get an API key, create an account at elevenlabs.io, and go to Profile Settings to copy it.
+To get an API key, create an account at openai.com, and go to API Keys to create a new key.
 
-Note that using this extension will count against your character quota. As such, **DO NOT** use this TTS service for critical announcements, it will stop working once you've used up your quota.
+Note that using this extension will count against your API usage quota and you may be charged based on your OpenAI plan.
 
 ## Caching
 
-This integration inherently uses caching for the responses, meaning that if the text and options are the same as a previous service call, the response audio likely will be a replay of the previous response. The downside is this negates the natural variability that ElevenLabs provides when using the same phrase multiple times. The upside is that it reduces your quota usage and speeds up responses.
+This integration inherently uses caching for the responses, meaning that if the text and options are the same as a previous service call, the response audio likely will be a replay of the previous response.
 
 ## Example service call
 
@@ -49,15 +48,33 @@ data:
   media_player_entity_id: media_player.bedroom_speaker
   message: Hello, how are you today?
   options:
-    voice: Bella
-    stability: 1
-    similarity: 1
-    style: 0.3 # Only supported in eleven_multilingual_v2
-    use_speaker_boost: "true" # Only supported in eleven_multilingual_v2
-    model: eleven_multilingual_v2
-    optimize_streaming_latency: 3
+    voice: echo
+    model: gpt-4o-mini-tts
+    instructions: Speak in a cheerful and positive tone.
+    response_format: mp3
 target:
-  entity_id: tts.elevenlabstts
+  entity_id: tts.openaitts
 ```
 
 The parameters in `options` are fully optional, and override the defaults specified in the integration config.
+
+## Voice Options
+
+The integration provides 11 built-in voices to control how speech is rendered from text:
+
+- alloy
+- ash
+- ballad
+- coral
+- echo
+- fable
+- onyx
+- nova
+- sage
+- shimmer
+
+## Supported Languages
+
+The TTS model generally follows the Whisper model in terms of language support. It supports many languages including but not limited to:
+
+English, Japanese, Chinese, German, Hindi, French, Korean, Portuguese, Italian, Spanish, and many more.

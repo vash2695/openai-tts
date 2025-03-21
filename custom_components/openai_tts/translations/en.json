@@ -1,0 +1,44 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Account is already configured",
+            "reauth_successful": "Re-authentication was successful"
+        },
+        "error": {
+            "already_configured": "Account is already configured",
+            "cannot_connect": "Failed to connect to OpenAI API",
+            "invalid_auth": "Invalid API key",
+            "rate_limit": "OpenAI rate limit exceeded",
+            "openai_error": "OpenAI API error: {error_msg}",
+            "unknown_error": "Unexpected error: {error_msg}"
+        },
+        "step": {
+            "user": {
+                "data": {
+                    "api_key": "API Key"
+                },
+                "description": "Get your API key from the OpenAI website",
+                "title": "OpenAI TTS - Configuration"
+            }
+        }
+    },
+    "options": {
+        "step": {
+            "init": {
+                "data": {
+                    "api_key": "API Key",
+                    "voice": "Name of voice to use",
+                    "model": "Change the model used for requests",
+                    "instructions": "Optional instructions for voice tone, style or emotions",
+                    "response_format": "Audio format for the response",
+                    
+                    "stability": "(Legacy) Set the stability of the speech synthesis",
+                    "similarity": "(Legacy) Set the clarity/similarity boost of the speech synthesis",
+                    "optimize_streaming_latency": "(Legacy) Reduce latency at the cost of quality",
+                    "style": "(Legacy) Style exaggeration, not supported in v1 models",
+                    "use_speaker_boost": "(Legacy) Speaker boost, not supported in v1 models"
+                }
+            }
+        }
+    }
+} 
