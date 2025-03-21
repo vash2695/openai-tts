@@ -1,6 +1,6 @@
 # OpenAI TTS for Home Assistant
 
-This integration allows you to use OpenAI's Text-to-Speech API as a text-to-speech provider for Home Assistant. It is a complete rework based on the [ElevenLabsTTS](https://github.com/carleeno/elevenlabs_tts) integration made by carleeno.
+This integration allows you to use OpenAI's Text-to-Speech API as a text-to-speech provider for Home Assistant. It is a complete rework based on the [ElevenLabs TTS](https://github.com/carleeno/elevenlabs_tts) integration made by carleeno.
 
 Disclaimer: This repo, the code within, and the maintainer/owner of this repo are in no way affiliated with OpenAI.
 
