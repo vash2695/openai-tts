@@ -82,20 +82,22 @@ class OpenAITTSSetupFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class OpenAITTSOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle TTS options."""
 
-    def __init__(self, config_entry):
+    def __init__(self, entry):
         """Initialize TTS options flow."""
-        self.config_entry = config_entry
+        self._entry = entry
 
     async def async_step_init(self, user_input=None):
         """Manage the TTS options."""
         if user_input is not None:
-            # Ensure we store empty strings as empty strings, not as None
+            # Handle empty instructions explicitly
             if CONF_INSTRUCTIONS in user_input and user_input[CONF_INSTRUCTIONS] == "":
+                # Make sure empty strings are preserved as empty strings
                 user_input[CONF_INSTRUCTIONS] = ""
+            
             return self.async_create_entry(title="", data=user_input)
 
         # Get current instructions or empty string (not None)
-        current_instructions = self.config_entry.options.get(CONF_INSTRUCTIONS, "")
+        current_instructions = self._entry.options.get(CONF_INSTRUCTIONS, "")
         if current_instructions is None:
             current_instructions = ""
 
@@ -105,17 +107,17 @@ class OpenAITTSOptionsFlowHandler(config_entries.OptionsFlow):
                 {
                     vol.Optional(
                         CONF_API_KEY,
-                        default=self.config_entry.data.get(CONF_API_KEY),
+                        default=self._entry.data.get(CONF_API_KEY),
                     ): str,
                     vol.Optional(
                         ATTR_VOICE,
-                        default=self.config_entry.options.get(
+                        default=self._entry.options.get(
                             ATTR_VOICE, DEFAULT_VOICE
                         ),
                     ): vol.In(OPENAI_VOICES),
                     vol.Optional(
                         CONF_MODEL,
-                        default=self.config_entry.options.get(
+                        default=self._entry.options.get(
                             CONF_MODEL, DEFAULT_MODEL
                         ),
                     ): vol.In(OPENAI_MODELS),
@@ -125,7 +127,7 @@ class OpenAITTSOptionsFlowHandler(config_entries.OptionsFlow):
                     ): str,
                     vol.Optional(
                         CONF_RESPONSE_FORMAT,
-                        default=self.config_entry.options.get(
+                        default=self._entry.options.get(
                             CONF_RESPONSE_FORMAT, DEFAULT_RESPONSE_FORMAT
                         ),
                     ): vol.In(OUTPUT_FORMATS),

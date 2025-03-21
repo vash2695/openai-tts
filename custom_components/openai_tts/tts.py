@@ -117,11 +117,24 @@ class OpenAITTSProvider(TextToSpeechEntity):
         """Load TTS from the OpenAI API."""
         return await self._client.get_tts_audio(message, options)
 
-    def get_cache_key_base(self, message: str, language: str, options: dict) -> str:
+    def get_cache_key_base(self, message: str, language: str, options: dict | None = None) -> str:
         """Get base for generating cache key."""
+        if options is None:
+            options = {}
+
+        # Make a copy to avoid modifying the original
+        options_copy = dict(options)
+        
+        # Ensure consistent handling of empty instructions
+        if CONF_INSTRUCTIONS in options_copy:
+            if not options_copy[CONF_INSTRUCTIONS] or options_copy[CONF_INSTRUCTIONS].strip() == "":
+                # Empty instruction is significant and should be part of the key
+                options_copy[CONF_INSTRUCTIONS] = ""
+        
+        # Convert to JSON for cache key
         options_json = json.dumps(
-            options, sort_keys=True, ensure_ascii=False, separators=(",", ":")
-        ) if options else "{}"
+            options_copy, sort_keys=True, ensure_ascii=False, separators=(",", ":")
+        )
         
         key_base = f"{message}_{language}_{options_json}"
         return hashlib.sha1(key_base.encode("utf-8")).hexdigest()

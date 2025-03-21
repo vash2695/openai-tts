@@ -100,13 +100,18 @@ class OpenAIClient:
             or DEFAULT_MODEL
         )
         
-        # Explicitly handle empty string for instructions
+        # Get instructions with special handling for empty string
+        instructions = None
         if CONF_INSTRUCTIONS in options:
             instructions = options.get(CONF_INSTRUCTIONS)
-        elif CONF_INSTRUCTIONS in self.config_entry.options:
+        elif self.config_entry.options and CONF_INSTRUCTIONS in self.config_entry.options:
             instructions = self.config_entry.options.get(CONF_INSTRUCTIONS)
         else:
             instructions = DEFAULT_INSTRUCTIONS
+            
+        # Convert None to empty string to ensure consistent handling
+        if instructions is None:
+            instructions = ""
         
         response_format = (
             options.get(CONF_RESPONSE_FORMAT)
@@ -134,7 +139,7 @@ class OpenAIClient:
             }
             
             # Only add instructions if not empty
-            if instructions:
+            if instructions and instructions.strip():
                 kwargs["instructions"] = instructions
                 
             # Make the API call
