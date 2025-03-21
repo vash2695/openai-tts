@@ -2,7 +2,7 @@
   "domain": "openai_tts",
   "name": "OpenAI TTS",
   "codeowners": [
-    "@carleeno"
+    "@vash2695"
   ],
   "config_flow": true,
   "dependencies": [
