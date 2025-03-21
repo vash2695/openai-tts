@@ -15,12 +15,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from .const import (
     CONF_INSTRUCTIONS,
     CONF_MODEL,
-    CONF_OPTIMIZE_LATENCY,
     CONF_RESPONSE_FORMAT,
-    CONF_SIMILARITY,
-    CONF_STABILITY,
-    CONF_STYLE,
-    CONF_USE_SPEAKER_BOOST,
     DOMAIN,
     OUTPUT_FORMATS,
 )
@@ -112,12 +107,6 @@ class OpenAITTSProvider(TextToSpeechEntity):
             CONF_RESPONSE_FORMAT,
             CONF_API_KEY,
             ATTR_AUDIO_OUTPUT,
-            # Legacy options kept for compatibility
-            CONF_STABILITY,
-            CONF_SIMILARITY,
-            CONF_STYLE,
-            CONF_USE_SPEAKER_BOOST,
-            CONF_OPTIMIZE_LATENCY,
         ]
 
     async def async_get_tts_audio(

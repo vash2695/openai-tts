@@ -9,20 +9,10 @@ import voluptuous as vol
 from .const import (
     CONF_INSTRUCTIONS,
     CONF_MODEL,
-    CONF_OPTIMIZE_LATENCY,
     CONF_RESPONSE_FORMAT,
-    CONF_SIMILARITY,
-    CONF_STABILITY,
-    CONF_STYLE,
-    CONF_USE_SPEAKER_BOOST,
     DEFAULT_INSTRUCTIONS,
     DEFAULT_MODEL,
-    DEFAULT_OPTIMIZE_LATENCY,
     DEFAULT_RESPONSE_FORMAT,
-    DEFAULT_SIMILARITY,
-    DEFAULT_STABILITY,
-    DEFAULT_STYLE,
-    DEFAULT_USE_SPEAKER_BOOST,
     DEFAULT_VOICE,
     DOMAIN,
     OPENAI_MODELS,
@@ -133,46 +123,6 @@ class OpenAITTSOptionsFlowHandler(config_entries.OptionsFlow):
                             CONF_RESPONSE_FORMAT, DEFAULT_RESPONSE_FORMAT
                         ),
                     ): vol.In(OUTPUT_FORMATS),
-                    # Legacy options kept for compatibility
-                    vol.Optional(
-                        CONF_STABILITY,
-                        default=self.config_entry.options.get(
-                            CONF_STABILITY, DEFAULT_STABILITY
-                        ),
-                    ): vol.All(
-                        vol.Coerce(float),
-                        vol.Range(min=0, max=1),
-                    ),
-                    vol.Optional(
-                        CONF_SIMILARITY,
-                        default=self.config_entry.options.get(
-                            CONF_SIMILARITY, DEFAULT_SIMILARITY
-                        ),
-                    ): vol.All(
-                        vol.Coerce(float),
-                        vol.Range(min=0, max=1),
-                    ),
-                    vol.Optional(
-                        CONF_OPTIMIZE_LATENCY,
-                        default=self.config_entry.options.get(
-                            CONF_OPTIMIZE_LATENCY, DEFAULT_OPTIMIZE_LATENCY
-                        ),
-                    ): vol.All(int, vol.Range(min=0, max=4)),
-                    vol.Optional(
-                        CONF_STYLE,
-                        default=self.config_entry.options.get(
-                            CONF_STYLE, DEFAULT_STYLE
-                        ),
-                    ): vol.All(
-                        vol.Coerce(float),
-                        vol.Range(min=0, max=1),
-                    ),
-                    vol.Optional(
-                        CONF_USE_SPEAKER_BOOST,
-                        default=self.config_entry.options.get(
-                            CONF_USE_SPEAKER_BOOST, DEFAULT_USE_SPEAKER_BOOST
-                        ),
-                    ): bool,
                 }
             ),
         )

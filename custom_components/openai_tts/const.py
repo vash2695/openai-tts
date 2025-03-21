@@ -20,21 +20,7 @@ DEFAULT_MODEL = "gpt-4o-mini-tts"
 # OpenAI TTS Models
 OPENAI_MODELS = [
     "gpt-4o-mini-tts",  # Default model
-    "tts-1",            # Standard voice generation
-    "tts-1-hd",         # High-definition voice generation
 ]
-
-# Legacy ElevenLabs parameters (keeping for backward compatibility)
-CONF_STABILITY = "stability"
-DEFAULT_STABILITY = 0.75
-CONF_SIMILARITY = "similarity"
-DEFAULT_SIMILARITY = 0.9
-CONF_OPTIMIZE_LATENCY = "optimize_streaming_latency"
-DEFAULT_OPTIMIZE_LATENCY = 0
-CONF_STYLE = "style"
-DEFAULT_STYLE = 0.2
-CONF_USE_SPEAKER_BOOST = "use_speaker_boost"
-DEFAULT_USE_SPEAKER_BOOST = True
 
 # New OpenAI-specific parameters
 CONF_INSTRUCTIONS = "instructions"

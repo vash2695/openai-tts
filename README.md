@@ -25,7 +25,7 @@ Enter your API key from your OpenAI account and click Submit.
 To customize the default options, in Devices & Services, click CONFIGURE on the OpenAI TTS card.
 
 - `Voice` - Choose one of the available voices (echo, alloy, onyx, nova, shimmer, etc.)
-- `Model` - Select which model to use (default is gpt-4o-mini-tts)
+- `Model` - Select which model to use (currently only supports gpt-4o-mini-tts)
 - `Instructions` - Optional instructions to control aspects of speech like accent, emotional range, intonation, etc.
 - `Response Format` - Audio format for the response (mp3, opus, aac, flac, wav, pcm)
 
