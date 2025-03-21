@@ -1,5 +1,5 @@
 {
-    "name": "ElevenLabs TTS Custom Component",
+    "name": "OpenAI TTS Custom Component",
     "image": "mcr.microsoft.com/vscode/devcontainers/python:0-3.11",
     "postCreateCommand": "scripts/setup",
     "appPort": [
