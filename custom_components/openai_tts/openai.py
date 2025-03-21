@@ -10,7 +10,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY
 from homeassistant.core import HomeAssistant
 
-from . import normalize_instructions
 from .const import (
     CONF_INSTRUCTIONS,
     CONF_MODEL,
@@ -22,6 +21,7 @@ from .const import (
     DOMAIN,
     OPENAI_VOICES,
 )
+from .util import normalize_instructions
 
 _LOGGER = logging.getLogger(__name__)
 

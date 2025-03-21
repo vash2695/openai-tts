@@ -14,7 +14,6 @@ from homeassistant.const import CONF_API_KEY
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from . import normalize_instructions
 from .const import (
     CONF_INSTRUCTIONS,
     CONF_MODEL,
@@ -23,6 +22,7 @@ from .const import (
     OUTPUT_FORMATS,
 )
 from .openai import OpenAIClient
+from .util import normalize_instructions
 
 _LOGGER = logging.getLogger(__name__)
 
