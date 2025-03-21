@@ -14,6 +14,7 @@ from homeassistant.const import CONF_API_KEY
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
+from . import normalize_instructions
 from .const import (
     CONF_INSTRUCTIONS,
     CONF_MODEL,
@@ -50,6 +51,14 @@ class OpenAITTSProvider(TextToSpeechEntity):
         self._name = "OpenAI TTS"
 
         self._attr_unique_id = f"{config_entry.entry_id}-tts"
+        _LOGGER.debug("Initialized TTS provider with unique_id: %s", self._attr_unique_id)
+        
+        # Log configuration options
+        if config_entry.options:
+            _LOGGER.debug(
+                "TTS provider initialized with options: %s", 
+                {k: v for k, v in config_entry.options.items() if k != CONF_API_KEY}
+            )
 
     @property
     def default_language(self) -> str:
@@ -115,6 +124,16 @@ class OpenAITTSProvider(TextToSpeechEntity):
         self, message: str, language: str, options: dict | None = None
     ) -> TtsAudioType:
         """Load TTS from the OpenAI API."""
+        _LOGGER.debug("async_get_tts_audio called with message: %s, language: %s, options: %s", 
+                     message[:20] + "..." if len(message) > 20 else message, 
+                     language, 
+                     options)
+                     
+        # Get the current config_entry options for debugging
+        if self._config_entry.options:
+            _LOGGER.debug("Current config_entry options: %s", 
+                         {k: v for k, v in self._config_entry.options.items() if k != CONF_API_KEY})
+        
         return await self._client.get_tts_audio(message, options)
 
     def get_cache_key_base(self, message: str, language: str, options: dict | None = None) -> str:
@@ -122,14 +141,28 @@ class OpenAITTSProvider(TextToSpeechEntity):
         if options is None:
             options = {}
 
+        _LOGGER.debug("Getting cache key for options: %s", options)
+        
         # Make a copy to avoid modifying the original
         options_copy = dict(options)
         
-        # Ensure consistent handling of empty instructions
+        # Include config entry options that aren't overridden in the service call
+        if self._config_entry and self._config_entry.options:
+            # Only include specific TTS options, not all config entry options
+            for opt in self.supported_options:
+                if opt not in options_copy and opt in self._config_entry.options:
+                    options_copy[opt] = self._config_entry.options[opt]
+                    _LOGGER.debug("Added config entry option %s: %s to cache key", 
+                                 opt, 
+                                 options_copy[opt])
+        
+        # Ensure consistent handling of instructions using the normalize_instructions function
         if CONF_INSTRUCTIONS in options_copy:
-            if not options_copy[CONF_INSTRUCTIONS] or options_copy[CONF_INSTRUCTIONS].strip() == "":
-                # Empty instruction is significant and should be part of the key
-                options_copy[CONF_INSTRUCTIONS] = ""
+            original_value = options_copy[CONF_INSTRUCTIONS]
+            options_copy[CONF_INSTRUCTIONS] = normalize_instructions(original_value)
+            if original_value != options_copy[CONF_INSTRUCTIONS]:
+                _LOGGER.debug("Normalized instructions for cache key from '%s' to '%s'", 
+                             original_value, options_copy[CONF_INSTRUCTIONS])
         
         # Convert to JSON for cache key
         options_json = json.dumps(
@@ -137,7 +170,12 @@ class OpenAITTSProvider(TextToSpeechEntity):
         )
         
         key_base = f"{message}_{language}_{options_json}"
-        return hashlib.sha1(key_base.encode("utf-8")).hexdigest()
+        cache_key = hashlib.sha1(key_base.encode("utf-8")).hexdigest()
+        
+        _LOGGER.debug("Generated cache key: %s from options_json: %s", 
+                     cache_key, options_json)
+        
+        return cache_key
 
     def async_get_supported_voices(self, language: str) -> list[Voice] | None:
         """Return a list of supported voices for a language."""
