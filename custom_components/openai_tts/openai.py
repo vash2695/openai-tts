@@ -21,7 +21,6 @@ from .const import (
     DOMAIN,
     OPENAI_VOICES,
 )
-from .util import normalize_instructions
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,13 +47,6 @@ class OpenAIClient:
         
         # Create Voice objects for UI
         self.voices = [Voice(voice_id=voice, name=voice.capitalize()) for voice in OPENAI_VOICES]
-        
-        # Log initial config
-        if config_entry and config_entry.options:
-            _LOGGER.debug(
-                "Initial config - options: %s", 
-                {k: (v if k != CONF_API_KEY else "***") for k, v in config_entry.options.items()}
-            )
 
     async def get_voices(self) -> List[str]:
         """Get voices from the API.
@@ -94,14 +86,6 @@ class OpenAIClient:
         
         if not options:
             options = {}
-        
-        _LOGGER.debug("Options passed to get_tts_audio: %s", options)
-        
-        if self.config_entry and self.config_entry.options:
-            _LOGGER.debug(
-                "Config entry options: %s", 
-                {k: v for k, v in self.config_entry.options.items() if k != CONF_API_KEY}
-            )
             
         # Get options with defaults
         voice_opt = (
@@ -116,25 +100,11 @@ class OpenAIClient:
             or DEFAULT_MODEL
         )
         
-        # Get instructions with normalization
-        instructions = None
-        
-        # First check if instructions are in the direct options 
-        if CONF_INSTRUCTIONS in options:
-            raw_instructions = options.get(CONF_INSTRUCTIONS)
-            instructions = normalize_instructions(raw_instructions)
-            _LOGGER.debug("Using normalized instructions from options: '%s' (was: '%s')", 
-                         instructions, raw_instructions)
-        # Then check config_entry options
-        elif self.config_entry and self.config_entry.options and CONF_INSTRUCTIONS in self.config_entry.options:
-            raw_instructions = self.config_entry.options.get(CONF_INSTRUCTIONS)
-            instructions = normalize_instructions(raw_instructions)
-            _LOGGER.debug("Using normalized instructions from config_entry: '%s' (was: '%s')", 
-                         instructions, raw_instructions)
-        # Fall back to default
-        else:
-            instructions = DEFAULT_INSTRUCTIONS
-            _LOGGER.debug("Using default instructions: '%s'", instructions)
+        instructions = (
+            options.get(CONF_INSTRUCTIONS)
+            or self.config_entry.options.get(CONF_INSTRUCTIONS)
+            or DEFAULT_INSTRUCTIONS
+        )
         
         response_format = (
             options.get(CONF_RESPONSE_FORMAT)
@@ -148,8 +118,8 @@ class OpenAIClient:
         
         # Log the request details
         _LOGGER.debug(
-            "TTS Request - model: %s, voice: %s, format: %s, instructions: '%s'",
-            model, voice_id, response_format, instructions
+            "TTS Request - model: %s, voice: %s, format: %s, instructions: %s",
+            model, voice_id, response_format, instructions if instructions else "None"
         )
         
         try:
@@ -161,21 +131,14 @@ class OpenAIClient:
                 "response_format": response_format,
             }
             
-            # Only add instructions if it's not an empty string
-            if instructions and instructions.strip():
-                _LOGGER.debug("Adding instructions to API call: '%s'", instructions)
+            if instructions:
                 kwargs["instructions"] = instructions
-            else:
-                _LOGGER.debug("Instructions is empty or whitespace, not adding to API call")
                 
             # Make the API call
-            _LOGGER.debug("Making OpenAI API call with kwargs: %s", 
-                         {k: v for k, v in kwargs.items() if k != "input"})
             response = self.client.audio.speech.create(**kwargs)
             
             # Get the audio content
             audio_content = response.content
-            _LOGGER.debug("Received %d bytes of audio content", len(audio_content))
             
             return response_format, audio_content
             

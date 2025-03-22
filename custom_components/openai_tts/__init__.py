@@ -8,28 +8,14 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 
-from .const import CONF_INSTRUCTIONS, DEFAULT_VOICE, DOMAIN, PLATFORMS
+from .const import DEFAULT_VOICE, DOMAIN, PLATFORMS
 from .openai import OpenAIClient
-from .util import normalize_instructions
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up the OpenAI TTS component from a config entry."""
-    _LOGGER.debug("Setting up OpenAI TTS integration for entry: %s", entry.entry_id)
-    
-    # Normalize any entry options
-    if entry.options and CONF_INSTRUCTIONS in entry.options:
-        # Don't modify the entry directly, but handle normalization when accessing
-        instructions_value = entry.options.get(CONF_INSTRUCTIONS)
-        normalized = normalize_instructions(instructions_value)
-        if normalized != instructions_value:
-            _LOGGER.debug(
-                "Instruction value in config entry needed normalization: '%s' -> '%s'",
-                instructions_value, normalized
-            )
-    
     hass.data.setdefault(DOMAIN, {})
 
     client = OpenAIClient(hass, entry)

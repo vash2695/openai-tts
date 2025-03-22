@@ -3,7 +3,6 @@ from homeassistant.components.tts import ATTR_VOICE
 from homeassistant.const import CONF_API_KEY
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
-import logging
 import openai
 import voluptuous as vol
 
@@ -22,7 +21,6 @@ from .const import (
 )
 from .openai import OpenAIClient
 
-_LOGGER = logging.getLogger(__name__)
 
 class OpenAITTSSetupFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 1
@@ -84,76 +82,49 @@ class OpenAITTSSetupFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class OpenAITTSOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle TTS options."""
 
-    def __init__(self, entry):
+    def __init__(self, config_entry):
         """Initialize TTS options flow."""
-        self._entry = entry
-        _LOGGER.debug("Initializing options flow for entry: %s", entry.entry_id)
-        if entry.options:
-            _LOGGER.debug("Current entry options: %s", 
-                         {k: v for k, v in entry.options.items() if k != CONF_API_KEY})
+        self.config_entry = config_entry
 
     async def async_step_init(self, user_input=None):
         """Manage the TTS options."""
         if user_input is not None:
-            _LOGGER.debug("Received options user_input: %s", 
-                         {k: v for k, v in user_input.items() if k != CONF_API_KEY})
-            
-            # Explicitly handle empty instructions
-            if CONF_INSTRUCTIONS in user_input:
-                if user_input[CONF_INSTRUCTIONS] == "" or user_input[CONF_INSTRUCTIONS] is None:
-                    _LOGGER.debug("Empty instructions detected, storing as empty string")
-                    user_input[CONF_INSTRUCTIONS] = ""
-            
-            data = {**user_input}
-            _LOGGER.debug("Saving options: %s", 
-                         {k: v for k, v in data.items() if k != CONF_API_KEY})
-            return self.async_create_entry(title="", data=data)
+            return self.async_create_entry(title="", data=user_input)
 
-        # Get current instructions or empty string (not None)
-        current_instructions = self._entry.options.get(CONF_INSTRUCTIONS)
-        _LOGGER.debug("Current instructions value: '%s' (type: %s)", 
-                     current_instructions, 
-                     type(current_instructions).__name__ if current_instructions is not None else "None")
-        
-        # Normalize to empty string
-        if current_instructions is None:
-            current_instructions = ""
-            _LOGGER.debug("Normalized None instructions to empty string for form")
-
-        schema = vol.Schema(
-            {
-                vol.Optional(
-                    CONF_API_KEY,
-                    default=self._entry.data.get(CONF_API_KEY),
-                ): str,
-                vol.Optional(
-                    ATTR_VOICE,
-                    default=self._entry.options.get(
-                        ATTR_VOICE, DEFAULT_VOICE
-                    ),
-                ): vol.In(OPENAI_VOICES),
-                vol.Optional(
-                    CONF_MODEL,
-                    default=self._entry.options.get(
-                        CONF_MODEL, DEFAULT_MODEL
-                    ),
-                ): vol.In(OPENAI_MODELS),
-                vol.Optional(
-                    CONF_INSTRUCTIONS,
-                    default=current_instructions,
-                ): str,
-                vol.Optional(
-                    CONF_RESPONSE_FORMAT,
-                    default=self._entry.options.get(
-                        CONF_RESPONSE_FORMAT, DEFAULT_RESPONSE_FORMAT
-                    ),
-                ): vol.In(OUTPUT_FORMATS),
-            }
-        )
-        
         return self.async_show_form(
             step_id="init",
-            data_schema=schema,
+            data_schema=vol.Schema(
+                {
+                    vol.Optional(
+                        CONF_API_KEY,
+                        default=self.config_entry.data.get(CONF_API_KEY),
+                    ): str,
+                    vol.Optional(
+                        ATTR_VOICE,
+                        default=self.config_entry.options.get(
+                            ATTR_VOICE, DEFAULT_VOICE
+                        ),
+                    ): vol.In(OPENAI_VOICES),
+                    vol.Optional(
+                        CONF_MODEL,
+                        default=self.config_entry.options.get(
+                            CONF_MODEL, DEFAULT_MODEL
+                        ),
+                    ): vol.In(OPENAI_MODELS),
+                    vol.Optional(
+                        CONF_INSTRUCTIONS,
+                        default=self.config_entry.options.get(
+                            CONF_INSTRUCTIONS, DEFAULT_INSTRUCTIONS
+                        ),
+                    ): str,
+                    vol.Optional(
+                        CONF_RESPONSE_FORMAT,
+                        default=self.config_entry.options.get(
+                            CONF_RESPONSE_FORMAT, DEFAULT_RESPONSE_FORMAT
+                        ),
+                    ): vol.In(OUTPUT_FORMATS),
+                }
+            ),
         )
 
 
